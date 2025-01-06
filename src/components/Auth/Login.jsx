@@ -1,24 +1,64 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState("customers");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // for animation
-    setTimeout(() => {
+    try {
+      const response = await fetch(
+        `http://localhost:1337/api/${role}?filters[email][$eq]=${email}`
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch data");
+      }
+
+      if (data.data.length === 0) {
+        setError("Wrong Credentials");
+        setLoading(false);
+        setTimeout(() => {
+          setEmail("");
+          setPassword("");
+          setShowPassword(false);
+        }, 1500);
+        return;
+      }
+
+      const user = data.data[0];
+      if (user.password !== password) {
+        setLoading(false);
+        setTimeout(() => {
+          setEmail("");
+          setPassword("");
+          setShowPassword(false);
+        }, 1500);
+        return;
+      }
+
+      sessionStorage.setItem("user", JSON.stringify(user));
+      if (role === "admins") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
       setLoading(false);
-      alert("Logged in successfully!");
-    }, 2000);
+    }
   };
 
   return (
@@ -40,6 +80,8 @@ function Login() {
                 id="email"
                 type="email"
                 placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
               />
             </div>
@@ -52,6 +94,8 @@ function Login() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
               />
               {/* Toggle Visibility Button */}
@@ -67,37 +111,49 @@ function Login() {
                 )}
               </button>
             </div>
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full py-2 font-semibold rounded-md bg-teal-600 text-white hover:bg-teal-700 flex items-center justify-center"
-              disabled={loading}
-            >
-              {loading ? (
-                <svg
-                  className="w-5 h-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
-                </svg>
-              ) : (
-                "Sign In"
-              )}
-            </button>
+            {/* Button and Dropdown */}
+            <div className="flex items-center gap-4">
+              {/* Dropdown */}
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+              >
+                <option value="customers">Customer</option>
+                <option value="admins">Admin</option>
+              </select>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="py-2 px-4 font-semibold rounded-md bg-teal-600 text-white hover:bg-teal-700 flex-grow flex items-center justify-center"
+                disabled={loading}
+              >
+                {loading ? (
+                  <svg
+                    className="w-5 h-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
+            </div>
           </form>
           {/* Register Link */}
           <p className="mt-6 text-sm text-gray-600">

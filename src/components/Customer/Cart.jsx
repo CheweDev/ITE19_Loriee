@@ -1,47 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Polaroid Camera",
-      description: "Classic",
-      price: 59.99,
-      quantity: 1,
-      selected: false,
-      image:
-        "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-    },
-    {
-      id: 2,
-      name: "Replica Headphones",
-      description: "White",
-      price: 99.95,
-      quantity: 1,
-      selected: false,
-      image:
-        "https://images.unsplash.com/photo-1504274066651-8d31a536b11a?ixlib=rb-1.2.1&auto=format&fit=crop&w=675&q=80",
-    },
-    {
-      id: 3,
-      name: "Travel Chargers",
-      description: "Black",
-      price: 8.99,
-      quantity: 1,
-      selected: false,
-      image:
-        "https://images.unsplash.com/photo-1594549181132-9045fed330ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=675&q=80",
-    },
-  ]);
+  const userDetails = JSON.parse(sessionStorage.getItem("user"));
   const [showModal, setShowModal] = useState(false);
   const [checkedOutItems, setCheckedOutItems] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
 
-  const userDetails = {
-    name: "Marc Dom Gerasmio",
-    address: "Villa Paraiso, Ampayon Butuan City",
-    phone: "09518149753",
+  const fetchCartItems = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:1337/api/carts?filters[user_name][$eq]=${userDetails.name}&_limit=1000`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setCartItems(data.data);
+      } else {
+        console.error("Failed to fetch cart items");
+      }
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+    }
   };
+
+
 
   const handleQuantityChange = (id, delta) => {
     setCartItems((prev) =>
@@ -53,9 +38,24 @@ const Cart = () => {
     );
   };
 
-  const handleRemoveItem = (id) => {
-    if (window.confirm("Are you sure you want to remove this item?")) {
-      setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleRemoveItem = async (item) => {
+    try {
+      const response = await fetch(
+        `http://localhost:1337/api/carts/${item.documentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+      window.location.reload();
+      } else {
+        console.error("Failed to delete item");
+      }
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
     }
   };
 
@@ -73,11 +73,71 @@ const Cart = () => {
     );
   };
 
-  const handleCheckout = () => {
-    const selectedItems = cartItems.filter((item) => item.selected);
-    setCheckedOutItems(selectedItems);
-    setShowModal(true);
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0];
+    const selectedCartItems = cartItems.filter((item) => item.selected);
+
+    for (const item of selectedCartItems) {
+      const cartData = {
+        data: {
+          product_name: item.product_name,
+          quantity: item.quantity,
+          total: item.price * item.quantity,
+          customer_name: item?.user_name || "Guest",
+          date: formattedDate,
+          branch_name: item.branch_name,
+        },
+      };
+
+      try {
+        const response = await fetch("http://localhost:1337/api/transactions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(cartData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error("Failed to add item:", errorData);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
+    handleDelete(selectedCartItems);
   };
+
+  const handleDelete = async (items) => {
+    for (const item of items) {
+      try {
+        const response = await fetch(
+          `http://localhost:1337/api/carts/${item.documentId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error(`Failed to delete item with id ${item.id}:`, errorData);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+    alert("Checkout successful");
+    window.location.reload();
+  };
+
 
   const selectedTotal = cartItems
     .filter((item) => item.selected)
@@ -94,13 +154,6 @@ const Cart = () => {
       <div className="flex flex-col mx-auto max-w-4xl p-3 space-y-2 sm:p-10 bg-gray-50 text-gray-800 mt-3">
         <div className="flex justify-between">
           <h2 className="text-2xl font-semibold">Your Cart</h2>
-          <button
-            type="button"
-            onClick={clearCart}
-            className="px-6 py-3 text-sm font-semibold text-red-600 border border-red-600 rounded-md hover:bg-red-100"
-          >
-            Clear Cart
-          </button>
         </div>
         {cartItems.length > 0 ? (
           <>
@@ -128,11 +181,8 @@ const Cart = () => {
                       <div className="flex justify-between w-full pb-2 space-x-2">
                         <div className="space-y-1">
                           <h3 className="text-lg font-semibold leading-snug sm:pr-8">
-                            {item.name}
+                            {item.product_name}
                           </h3>
-                          <p className="text-sm text-gray-600">
-                            {item.description}
-                          </p>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-semibold">
@@ -164,7 +214,7 @@ const Cart = () => {
                         <button
                           type="button"
                           className="flex items-center px-2 py-1 text-red-500 hover:text-red-700 space-x-1"
-                          onClick={() => handleRemoveItem(item.id)}
+                          onClick={() => handleRemoveItem(item)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

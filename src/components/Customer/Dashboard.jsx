@@ -1,6 +1,26 @@
 import Header from "./Header.jsx";
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`http://localhost:1337/api/products`);
+        const data = await response.json();
+  
+        // Shuffle the data and pick 8 random rows
+        const shuffledProducts = (data.data || []).sort(() => 0.5 - Math.random());
+        const randomProducts = shuffledProducts.slice(0, 8);
+  
+        setProducts(randomProducts); 
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+  
+    fetchProducts();
+  }, []);
   return (
     <>
       <Header />
@@ -18,7 +38,7 @@ const Dashboard = () => {
             </p>
             <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
               <a
-                href="#"
+                href="/product"
                 className="px-6 py-3 text-lg font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700"
               >
                 Start Shopping
@@ -92,29 +112,22 @@ const Dashboard = () => {
             Explore Our Top Picks
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((product, index) => (
-              <div
-                key={index}
-                className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-lg transition"
-              >
-                <img
-                  src={`img.jpg`}
-                  alt={`Product ${index + 1}`}
-                  className="object-cover w-full h-40 mb-4 rounded-lg"
-                />
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Product {index + 1}
-                </h3>
-                <p className="mt-2 text-sm text-gray-600"></p>
-                <p className="mt-2 text-md text-gray-600">$29.99</p>
-                <a
-                  href="#"
-                  className="block mt-4 px-4 py-2 text-center text-white bg-teal-600 rounded-lg hover:bg-teal-700"
-                >
-                  Add to Cart
-                </a>
-              </div>
-            ))}
+          {products.map((product, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-lg transition"
+          >
+            <img
+              src={product.image || 'placeholder.jpg'}
+              alt={product.name || `Product ${index + 1}`}
+              className="object-cover w-full h-40 mb-4 rounded-lg"
+            />
+            <h3 className="text-lg font-semibold text-gray-800">
+              {product.product_name || `Product ${index + 1}`}
+            </h3>
+            <p className="mt-2 text-md text-gray-600">${product.product_price || 'N/A'}</p>
+          </div>
+        ))}
           </div>
         </div>
       </section>
@@ -160,7 +173,7 @@ const Dashboard = () => {
               </svg>
             </div>
             <span className="w-12 h-1 my-4 rounded-lg bg-teal-600"></span>
-            <p className="text-xl font-semibold text-gray-800">John Marion</p>
+            <p className="text-xl font-semibold text-gray-800">Mary Jane</p>
             <p className="text-sm text-gray-500">Verified Buyer</p>
           </div>
           <div className="flex flex-col items-center text-center bg-white shadow-lg rounded-lg p-8 hover:shadow-xl transition">
@@ -189,7 +202,7 @@ const Dashboard = () => {
               </svg>
             </div>
             <span className="w-12 h-1 my-4 rounded-lg bg-teal-600"></span>
-            <p className="text-xl font-semibold text-gray-800">Marc Dominic</p>
+            <p className="text-xl font-semibold text-gray-800">John Doe</p>
             <p className="text-sm text-gray-500">Verified Buyer</p>
           </div>
         </div>

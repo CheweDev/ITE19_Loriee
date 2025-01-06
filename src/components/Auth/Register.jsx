@@ -5,20 +5,60 @@ import { FiEye, FiEyeOff } from "react-icons/fi"; // Importing eye icons from re
 function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    const jsonData = {
+      data: {
+        name: name,
+        email: email,
+        password: password,
+        address,
+        phoneNumber,
+      },
+    };
+    const jsonString = JSON.stringify(jsonData);
 
-    // Simulate a register process
-    setTimeout(() => {
-      setLoading(false);
-      alert("Registered successfully!");
-    }, 2000);
+    setLoading(true); // Set loading to true before making the request
+
+    try {
+      const response = await fetch(`http://localhost:1337/api/customers`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonString,
+      });
+      setLoading(false); // Set loading to false after receiving the response
+
+      if (response.ok) {
+        const data = await response.json();
+        alert("Registration successful!");
+      window.location.reload();
+      } else {
+        const errorData = await response.text();
+        alert("Registration failed!");
+        console.error(errorData);
+      }
+    } catch (error) {
+      setLoading(false); // Ensure loading is stopped even if an error occurs
+      console.error("Error:", error);
+      alert("An error occurred while registering!");
+    }
   };
 
   return (
@@ -40,6 +80,48 @@ function Register() {
             Create an account to get started with our platform.
           </p>
           <form noValidate className="space-y-4" onSubmit={handleRegister}>
+            {/* Name Field */}
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                placeholder="Full Name"
+                className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+              {/* Phone Number Field */}
+              <div>
+              <label htmlFor="email" className="sr-only">
+                Number
+              </label>
+              <input
+                id="number"
+                type="text"
+                placeholder="Phone Number"
+                className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </div>
+             {/* Address Field */}
+             <div>
+              <label htmlFor="email" className="sr-only">
+                Address
+              </label>
+              <input
+                id="address"
+                type="text"
+                placeholder="Address"
+                className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="sr-only">
@@ -50,6 +132,8 @@ function Register() {
                 type="email"
                 placeholder="Email Address"
                 className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             {/* Password Field */}
@@ -62,6 +146,8 @@ function Register() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               {/* Toggle Visibility Button */}
               <button
@@ -86,6 +172,8 @@ function Register() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Confirm Password"
                 className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-teal-500 focus:border-teal-500"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
               {/* Toggle Visibility Button */}
               <button

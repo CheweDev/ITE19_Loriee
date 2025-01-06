@@ -1,110 +1,86 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const AdminDashboard = () => {
-  // Static data for top sales and transactions
-  const transactionHistory = [
-    {
-      date: "2025-01-01",
-      branch: "Branch 1",
-      product: "Product A",
-      quantity: 10,
-      total: 1000,
-    },
-    {
-      date: "2025-01-02",
-      branch: "Branch 2",
-      product: "Product B",
-      quantity: 5,
-      total: 500,
-    },
-    {
-      date: "2025-01-03",
-      branch: "Branch 3",
-      product: "Product C",
-      quantity: 20,
-      total: 2000,
-    },
-    {
-      date: "2025-01-04",
-      branch: "Branch 4",
-      product: "Product D",
-      quantity: 15,
-      total: 1500,
-    },
-    {
-      date: "2025-01-05",
-      branch: "Branch 5",
-      product: "Product E",
-      quantity: 8,
-      total: 800,
-    },
-    {
-      date: "2025-01-05",
-      branch: "Branch 1",
-      product: "Product A",
-      quantity: 5,
-      total: 500,
-    },
-    {
-      date: "2025-01-05",
-      branch: "Branch 2",
-      product: "Product B",
-      quantity: 10,
-      total: 1000,
-    },
-  ];
+  const [transactionData, setTransactionData] = useState([]);
+  const [searchBranch, setSearchBranch] = useState("");
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
 
-  // Calculate Top Sales per Branch
+  // Fetch transaction history
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:1337/api/transactions?pagination[pageSize]=1000`
+        );
+        const data = await response.json();
+        const formattedData = data.data.map((item) => ({
+          date: item.date,
+          branch: item.branch_name,
+          product: item.product_name,
+          quantity: parseInt(item.quantity),
+          total: parseFloat(item.total),
+        }));
+        setTransactionData(formattedData);
+        setFilteredTransactions(formattedData); // Initialize filtered transactions
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchHistory();
+  }, []);
+
   const calculateTopSales = (transactions) => {
     const branchSalesMap = {};
-
-    transactions.forEach((transaction) => {
-      const { branch, product, quantity, total } = transaction;
-
+  
+    transactions.forEach(({ branch, product, quantity, total }) => {
       if (!branchSalesMap[branch]) {
         branchSalesMap[branch] = {
           branch,
           totalSales: 0,
-          topProduct: { name: product, quantity: 0 },
+          productQuantities: {}, // Track quantities for all products.
         };
       }
-
+  
       branchSalesMap[branch].totalSales += total;
-
-      if (quantity > branchSalesMap[branch].topProduct.quantity) {
-        branchSalesMap[branch].topProduct = { name: product, quantity };
+  
+      if (!branchSalesMap[branch].productQuantities[product]) {
+        branchSalesMap[branch].productQuantities[product] = 0;
       }
+  
+      branchSalesMap[branch].productQuantities[product] += quantity;
     });
-
-    return Object.values(branchSalesMap);
+  
+    return Object.values(branchSalesMap).map(({ branch, totalSales, productQuantities }) => {
+      const topProduct = Object.entries(productQuantities).reduce(
+        (top, [product, quantity]) => (quantity > top.quantity ? { name: product, quantity } : top),
+        { name: null, quantity: 0 }
+      );
+  
+      return { branch, totalSales, topProduct };
+    });
   };
 
-  const branchSales = calculateTopSales(transactionHistory);
-
-  const [searchBranch, setSearchBranch] = useState("");
-  const [filteredTransactions, setFilteredTransactions] =
-    useState(transactionHistory);
-
-  // Logout functionality
-  const handleLogout = () => {
-    // Clear user session or token
-    console.log("User logged out");
-    // Redirect to login page
-    window.location.href = "/";
-  };
+  const branchSales = calculateTopSales(transactionData);
 
   // Filter transactions by branch name
   const handleBranchFilter = (branchName) => {
     if (branchName === "") {
-      setFilteredTransactions(transactionHistory);
+      setFilteredTransactions(transactionData);
     } else {
-      const filtered = transactionHistory.filter(
+      const filtered = transactionData.filter(
         (transaction) =>
           transaction.branch.toLowerCase() === branchName.toLowerCase()
       );
       setFilteredTransactions(filtered);
     }
     setSearchBranch(branchName);
+  };
+
+  // Logout functionality
+  const handleLogout = () => {
+    console.log("User logged out");
+    window.location.href = "/";
   };
 
   return (
@@ -211,7 +187,7 @@ const AdminDashboard = () => {
                         {transaction.quantity}
                       </td>
                       <td className="border border-gray-300 px-4 py-2">
-                        ₱{transaction.total.toFixed(2)}
+                        ₱{transaction.total}
                       </td>
                     </tr>
                   ))

@@ -1,51 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header.jsx";
 
 const Purchased = () => {
-  // Static transaction data
-  const staticTransactions = [
-    {
-      id: 1,
-      date: "2025-01-05",
-      product_name: "T-shirt",
-      quantity: 2,
-      total: 40.0,
-    },
-    {
-      id: 2,
-      date: "2024-12-20",
-      product_name: "Laptop",
-      quantity: 1,
-      total: 800.0,
-    },
-    {
-      id: 3,
-      date: "2024-11-15",
-      product_name: "Headphones",
-      quantity: 1,
-      total: 50.0,
-    },
-    {
-      id: 4,
-      date: "2025-01-10",
-      product_name: "Jacket",
-      quantity: 1,
-      total: 60.0,
-    },
-    {
-      id: 5,
-      date: "2025-01-10",
-      product_name: "Gloves",
-      quantity: 2,
-      total: 40.0,
-    },
-  ];
+  const userDetails = JSON.parse(sessionStorage.getItem("user"));
+ 
 
-  const [transactionData, setTransactionData] = useState(staticTransactions);
+  const [transactionData, setTransactionData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Fetch transactions from the server
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:1337/api/transactions?filters[customer_name][$eq]=${userDetails.name}`
+        );
+        const data = await response.json();
+        setTransactionData(data.data);
+      } catch (error) {
+        console.error("Error fetching transaction data:", error);
+      }
+    };
+    fetchData();
+  }, [userDetails.name]);
 
   // Filter transactions by search query, date range, and sort order
   const filteredTransactions = transactionData.filter((transaction) => {
@@ -152,7 +132,7 @@ const Purchased = () => {
                       {transaction.quantity}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      ₱{transaction.total.toFixed(2)}
+                      ₱{transaction.total}
                     </td>
                   </tr>
                 ))}

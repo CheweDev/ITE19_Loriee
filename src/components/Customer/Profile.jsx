@@ -2,15 +2,7 @@ import React, { useState } from "react";
 import Header from "./Header";
 
 const Profile = () => {
-  // Static user data (mocked for now)
-  const initialUser = {
-    name: "Marc Dom Gerasmio",
-    email: "gwapoK0@gmail.com",
-    phone: "09518149753",
-    address: "Villa Paraiso, Ampayon Butuan City",
-    joinedDate: "1980-03-15",
-  };
-
+  const initialUser = JSON.parse(sessionStorage.getItem("user"));
   // States
   const [user, setUser] = useState(initialUser); // Current user data
   const [isEditing, setIsEditing] = useState(false); // Edit mode
@@ -65,7 +57,7 @@ const Profile = () => {
                   </h3>
                   <p className="text-sm text-gray-600 text-center">
                     Member since:{" "}
-                    {new Date(user.joinedDate).toLocaleDateString()}
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 
@@ -80,7 +72,7 @@ const Profile = () => {
                     <label className="w-32 text-gray-600 font-medium">
                       Phone:
                     </label>
-                    <span className="text-gray-800">{user.phone}</span>
+                    <span className="text-gray-800">{user.phoneNumber}</span>
                   </div>
                   <div className="flex items-center">
                     <label className="w-32 text-gray-600 font-medium">
@@ -89,86 +81,10 @@ const Profile = () => {
                     <span className="text-gray-800">{user.address}</span>
                   </div>
                 </div>
-
-                {/* Edit Button */}
-                <div className="text-center mt-6">
-                  <button
-                    className="btn bg-teal-700 text-white px-6 py-2 rounded-lg"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit Profile
-                  </button>
-                </div>
               </>
             ) : (
               <>
-                {/* Edit Form */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">
-                      Name:
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="input input-bordered border border-gray-300 rounded-lg p-2 w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">
-                      Email:
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="input input-bordered border border-gray-300 rounded-lg p-2 w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">
-                      Phone:
-                    </label>
-                    <input
-                      type="text"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="input input-bordered border border-gray-300 rounded-lg p-2 w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">
-                      Address:
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      className="input input-bordered border border-gray-300 rounded-lg p-2 w-full"
-                    />
-                  </div>
-                </div>
-
-                {/* Save/Cancel Buttons */}
-                <div className="text-center mt-6 flex justify-center gap-4">
-                  <button
-                    className="btn bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
-                    onClick={handleSave}
-                  >
-                    Save
-                  </button>
-                  <button
-                    className="btn bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
-                </div>
+              
               </>
             )}
           </div>
