@@ -1,36 +1,41 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi"; // Icons for showing/hiding the password
+import { useNavigate } from "react-router-dom"; // Hook for navigation
 
 function Login() {
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("customers");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  // State variables for managing form inputs and UI
+  const [loading, setLoading] = useState(false); // Tracks loading state during login
+  const [showPassword, setShowPassword] = useState(false); // Toggles password visibility
+  const [role, setRole] = useState("customers"); // Stores the selected role (customer/admin)
+  const [email, setEmail] = useState(""); // Stores the email input
+  const [password, setPassword] = useState(""); // Stores the password input
+  const navigate = useNavigate(); // For programmatic navigation
 
+  // Toggles password visibility between plain text and hidden
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
+  // Handles the login process
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
+    e.preventDefault(); // Prevents default form submission behavior
+    setLoading(true); // Indicates login is in progress
     try {
+      // Fetches user data based on the selected role and email
       const response = await fetch(
         `http://localhost:1337/api/${role}?filters[email][$eq]=${email}`
       );
-      const data = await response.json();
+      const data = await response.json(); // Parses the JSON response
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch data");
       }
 
+      // Checks if user data exists
       if (data.data.length === 0) {
-        setError("Wrong Credentials");
-        setLoading(false);
+        setError("Wrong Credentials"); // Sets error if no user found
+        setLoading(false); // Stops loading
+        // Resets form inputs and hides password after a delay
         setTimeout(() => {
           setEmail("");
           setPassword("");
@@ -39,9 +44,11 @@ function Login() {
         return;
       }
 
-      const user = data.data[0];
+      const user = data.data[0]; // Retrieves the first user
+      // Validates password
       if (user.password !== password) {
-        setLoading(false);
+        setLoading(false); // Stops loading
+        // Resets form inputs and hides password after a delay
         setTimeout(() => {
           setEmail("");
           setPassword("");
@@ -50,20 +57,22 @@ function Login() {
         return;
       }
 
+      // Stores user data in sessionStorage
       sessionStorage.setItem("user", JSON.stringify(user));
+      // Redirects based on the role
       if (role === "admins") {
         navigate("/admin");
       } else {
         navigate("/dashboard");
       }
     } catch (err) {
-      setLoading(false);
+      setLoading(false); // Stops loading on error
     }
   };
 
   return (
     <section className="p-6 bg-gray-100 text-gray-800 min-h-screen">
-      <div className="container grid gap-6 mx-auto text-center lg:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-6 text-center lg:grid-cols-2 xl:grid-cols-5 mt-14">
         {/* Left Section: Login Form */}
         <div className="w-full px-6 py-16 rounded-md sm:px-12 md:px-16 xl:col-span-2 bg-white shadow-md">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Login</h1>
@@ -92,7 +101,7 @@ function Login() {
               </label>
               <input
                 id="password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? "text" : "password"} // Toggles input type
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -105,15 +114,15 @@ function Login() {
                 className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-900"
               >
                 {showPassword ? (
-                  <FiEyeOff className="h-5 w-5" />
+                  <FiEyeOff className="h-5 w-5" /> // Eye-off icon
                 ) : (
-                  <FiEye className="h-5 w-5" />
+                  <FiEye className="h-5 w-5" /> // Eye icon
                 )}
               </button>
             </div>
-            {/* Button and Dropdown */}
+            {/* Role Dropdown and Login Button */}
             <div className="flex items-center gap-4">
-              {/* Dropdown */}
+              {/* Role Dropdown */}
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
@@ -122,11 +131,11 @@ function Login() {
                 <option value="customers">Customer</option>
                 <option value="admins">Admin</option>
               </select>
-              {/* Submit Button */}
+              {/* Login Button */}
               <button
                 type="submit"
                 className="py-2 px-4 font-semibold rounded-md bg-teal-600 text-white hover:bg-teal-700 flex-grow flex items-center justify-center"
-                disabled={loading}
+                disabled={loading} // Disables button during loading
               >
                 {loading ? (
                   <svg
@@ -135,6 +144,7 @@ function Login() {
                     fill="none"
                     viewBox="0 0 24 24"
                   >
+                    {/* Spinner for loading state */}
                     <circle
                       className="opacity-25"
                       cx="12"
@@ -150,7 +160,7 @@ function Login() {
                     ></path>
                   </svg>
                 ) : (
-                  "Sign In"
+                  "Sign In" // Default button text
                 )}
               </button>
             </div>

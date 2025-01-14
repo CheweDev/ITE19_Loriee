@@ -4,8 +4,16 @@ import Header from "./Header";
 const Cart = () => {
   const userDetails = JSON.parse(sessionStorage.getItem("user"));
   const [showModal, setShowModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [checkedOutItems, setCheckedOutItems] = useState([]);
   const [cartItems, setCartItems] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [bankProvider, setBankProvider] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [gcashNumber, setGcashNumber] = useState('');
+
+  const banks = ['Unionbank', 'Security Bank', 'Landbank', 'BPI', 'China Bank', 'EastWest', 'BDO', 'Metrobank'];
+
   useEffect(() => {
     fetchCartItems();
   }, []);
@@ -17,7 +25,7 @@ const Cart = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setCartItems(data.data);
+        setCartItems(data.data.map(item => ({ ...item, selected: false }))); // Initialize selected as false
       } else {
         console.error("Failed to fetch cart items");
       }
@@ -25,8 +33,6 @@ const Cart = () => {
       console.error("Error fetching cart items:", error);
     }
   };
-
-
 
   const handleQuantityChange = (id, delta) => {
     setCartItems((prev) =>
@@ -50,18 +56,12 @@ const Cart = () => {
         }
       );
       if (response.ok) {
-      window.location.reload();
+        window.location.reload();
       } else {
         console.error("Failed to delete item");
       }
     } catch (error) {
       console.error("Error removing item from cart:", error);
-    }
-  };
-
-  const clearCart = () => {
-    if (window.confirm("Are you sure you want to clear the cart?")) {
-      setCartItems([]);
     }
   };
 
@@ -73,12 +73,25 @@ const Cart = () => {
     );
   };
 
-  const handleCheckout = async (e) => {
+  const handleCheckoutClick = () => {
+    const hasSelectedItems = cartItems.some(item => item.selected);
+    if (!hasSelectedItems) {
+      alert("Please select at least one item to checkout");
+      return;
+    }
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSubmit = async (e) => {
     e.preventDefault();
+    const selectedCartItems = cartItems.filter((item) => item.selected);
+    if (selectedCartItems.length === 0) {
+      alert("Please select at least one item to checkout");
+      return;
+    }
 
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0];
-    const selectedCartItems = cartItems.filter((item) => item.selected);
 
     for (const item of selectedCartItems) {
       const cartData = {
@@ -89,6 +102,8 @@ const Cart = () => {
           customer_name: item?.user_name || "Guest",
           date: formattedDate,
           branch_name: item.branch_name,
+          bank_provider: paymentMethod === 'card' ? bankProvider : 'GCash',
+          card_number: paymentMethod === 'card' ? cardNumber : gcashNumber,
         },
       };
 
@@ -104,9 +119,11 @@ const Cart = () => {
         if (!response.ok) {
           const errorData = await response.text();
           console.error("Failed to add item:", errorData);
+          return;
         }
       } catch (error) {
         console.error("Error:", error);
+        return;
       }
     }
 
@@ -134,10 +151,10 @@ const Cart = () => {
         console.error("Error:", error);
       }
     }
+    setShowPaymentModal(false);
     alert("Checkout successful");
     window.location.reload();
   };
-
 
   const selectedTotal = cartItems
     .filter((item) => item.selected)
@@ -153,7 +170,7 @@ const Cart = () => {
       <Header />
       <div className="flex flex-col mx-auto max-w-4xl p-3 space-y-2 sm:p-10 bg-gray-50 text-gray-800 mt-3">
         <div className="flex justify-between">
-          <h2 className="text-2xl font-semibold">Your Cart</h2>
+          <h2 className="text-2xl font-bold">Cart</h2>
         </div>
         {cartItems.length > 0 ? (
           <>
@@ -167,7 +184,7 @@ const Cart = () => {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={item.selected}
+                        checked={item.selected || false}
                         onChange={() => handleSelectItem(item.id)}
                         className="h-5 w-5 text-teal-600 rounded"
                       />
@@ -186,7 +203,7 @@ const Cart = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-semibold">
-                            ${item.price.toFixed(2)}
+                            ₱{item.price.toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -222,24 +239,9 @@ const Cart = () => {
                             className="w-4 h-4 fill-current"
                           >
                             <path d="M96,472a23.82,23.82,0,0,0,23.579,24H392.421A23.82,23.82,0,0,0,416,472V152H96Zm32-288H384V464H128Z"></path>
-                            <rect
-                              width="32"
-                              height="200"
-                              x="168"
-                              y="216"
-                            ></rect>
-                            <rect
-                              width="32"
-                              height="200"
-                              x="240"
-                              y="216"
-                            ></rect>
-                            <rect
-                              width="32"
-                              height="200"
-                              x="312"
-                              y="216"
-                            ></rect>
+                            <rect width="32" height="200" x="168" y="216"></rect>
+                            <rect width="32" height="200" x="240" y="216"></rect>
+                            <rect width="32" height="200" x="312" y="216"></rect>
                             <path d="M328,88V40c0-13.458-9.488-24-21.6-24H205.6C193.488,16,184,26.542,184,40V88H64v32H448V88ZM216,48h80V88H216Z"></path>
                           </svg>
                           <span>Remove</span>
@@ -256,7 +258,7 @@ const Cart = () => {
                 Total amount for selected items:
                 <span className="font-semibold">
                   {" "}
-                  ${selectedTotal.toFixed(2)}
+                  ₱{selectedTotal.toFixed(2)}
                 </span>
               </p>
             </div>
@@ -264,15 +266,15 @@ const Cart = () => {
             <div className="space-y-4 text-right">
               <p>
                 Total amount for all items in the cart:
-                <span className="font-semibold"> ${total.toFixed(2)}</span>
+                <span className="font-semibold"> ₱{total.toFixed(2)}</span>
               </p>
             </div>
 
             <div className="flex justify-end items-center space-x-4">
               <button
                 type="button"
-                onClick={handleCheckout}
-                className="px-6 py-3 text-sm font-semibold text-white bg-teal-600 rounded-md hover:bg-teal-700"
+                onClick={handleCheckoutClick}
+                className="px-6 py-3 text-sm font-semibold text-white bg-green-800 rounded-md hover:bg-gray-900"
               >
                 Continue to Checkout (Selected)
               </button>
@@ -281,77 +283,112 @@ const Cart = () => {
         ) : (
           <div className="text-center">
             <p className="text-lg text-gray-500 mb-4">
-              Your cart is empty. Start shopping now!
+              Your cart is empty. Start adding now!
             </p>
-            <button className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+            <button className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-gray-900">
               Continue Shopping
             </button>
           </div>
         )}
       </div>
 
-      {/* Modal for Checkout */}
-      {showModal && (
+      {/* Payment Method Modal */}
+      {showPaymentModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <div className="bg-white p-10 rounded-md w-11/12 max-w-4xl flex">
-            {/* Left Section: Checked-out items */}
-            <div className="flex-1 space-y-4 border-r">
-              <h3 className="text-xl font-semibold">Checkout Summary</h3>
-              <ul className="space-y-4">
-                {checkedOutItems.map((item) => (
-                  <li key={item.id} className="flex items-center space-x-4">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                    <div>
-                      <p className="font-semibold">{item.name}</p>
-                      <p className="text-gray-600">${item.price.toFixed(2)}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Right Section: Shipping details and total */}
-            <div className="flex-1 pl-6 space-y-4">
-              <h3 className="text-xl font-semibold">Shipping Details</h3>
+          <div className="bg-teal-600 p-8 rounded-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Payment Method</h3>
+            <form onSubmit={handlePaymentSubmit} className="space-y-4">
               <div className="space-y-2">
-                <p>
-                  <strong>Name:</strong> {userDetails.name}
-                </p>
-                <p>
-                  <strong>Address:</strong> {userDetails.address}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {userDetails.phone}
-                </p>
+                <div className="flex space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      value="card"
+                      checked={paymentMethod === 'card'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="mr-2"
+                    />
+                    Card
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      value="gcash"
+                      checked={paymentMethod === 'gcash'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="mr-2"
+                    />
+                    GCash
+                  </label>
+                </div>
               </div>
 
-              {/* Total Price */}
-              <div className="mt-10 text-right">
-                <p className="text-lg font-semibold">
-                  Total Price: ${selectedTotal.toFixed(2)}
-                </p>
-              </div>
+              {paymentMethod === 'card' ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bank Provider
+                    </label>
+                    <select
+                      value={bankProvider}
+                      onChange={(e) => setBankProvider(e.target.value)}
+                      required
+                      className="w-full p-2 border rounded-md"
+                    >
+                      <option value="">Select Bank</option>
+                      {banks.map((bank) => (
+                        <option key={bank} value={bank}>
+                          {bank}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Card Number
+                    </label>
+                    <input
+                      type="text"
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(e.target.value)}
+                      required
+                      className="w-full p-2 border rounded-md"
+                      placeholder="Enter card number"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    GCash Number
+                  </label>
+                  <input
+                    type="text"
+                    value={gcashNumber}
+                    onChange={(e) => setGcashNumber(e.target.value)}
+                    required
+                    className="w-full p-2 border rounded-md"
+                    placeholder="Enter GCash number"
+                  />
+                </div>
+              )}
 
-              {/* Buttons */}
               <div className="flex justify-end space-x-4 mt-6">
                 <button
-                  onClick={() => setShowModal(false)}
-                  className="px-6 py-2 text-sm font-semibold text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
+                  type="button"
+                  onClick={() => setShowPaymentModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                 >
-                  Close
+                  Cancel
                 </button>
                 <button
-                  onClick={() => setShowModal(false)} // Placeholder for place order functionality
-                  className="px-6 py-2 text-sm font-semibold text-white bg-teal-600 rounded-md hover:bg-teal-700"
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-800 rounded-md hover:bg-green-900"
                 >
-                  Place Order
+                  Confirm Payment
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
+import Swal from 'sweetalert2';
+import { FaSearch, FaTimes,FaCheckCircle, FaRegCheckCircle  } from "react-icons/fa"; // Import icon for search and close button
 
 const Product = () => {
   // Example data
   const [branches, setBranches] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [notification, setNotification] = useState("");
   const userDetails = JSON.parse(sessionStorage.getItem("user"));
   
   useEffect(() => {
@@ -171,19 +174,38 @@ const Product = () => {
 
       if (response.ok) {
         const data = await response.json();
-        alert("Product added to cart!");
-        console.log(data);
-        window.location.reload();
+        setNotification("Product added to cart!");
+        setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
+        setShowModal(false);
+        Swal.fire({
+          title: "Success!",
+          text: "Product added to cart.",
+          icon: "success"
+        });
       } else {
-        const errorData = await response.text(); 
-        alert("Failed to add to cart!");
+        const errorData = await response.text();
+        setNotification("Failed to add to cart!");
+        setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
         console.error(errorData);
+        Swal.fire({
+          title: "Error",
+          text: "Failed to add the product to the cart.",
+          icon: "error"
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("An error occurred while adding to cart!");
+      setNotification("An error occurred while adding to cart!");
+      setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while adding the product to the cart.",
+        icon: "error"
+      });
     }
   };
+
+  const [isCashOnDelivery, setIsCashOnDelivery] = useState(false);
 
   return (
     <>
@@ -283,7 +305,7 @@ const Product = () => {
                     {product.category_name}
                   </p>
                   <p className="text-lg font-semibold text-gray-800 mb-4">
-                    ${product.product_price}
+                  ₱{product.product_price}
                   </p>
 
                   <div className="flex gap-2">
@@ -324,8 +346,7 @@ const Product = () => {
               />
             </div>
 
-            <div className="w-1/4">
-              {/* User Details Section */}
+            <div className="w-2/3">
               <div className="mb-4 border-b border-gray-300 pt-4">
                 <h3 className="text-lg font-semibold mb-2">Shipping Details</h3>
                 <p className="text-sm text-gray-700">
@@ -336,6 +357,22 @@ const Product = () => {
                 </p>
                 <p className="text-sm text-gray-700 mb-4">
                   <strong>Phone:</strong> {userDetails.phoneNumber}
+                </p>
+              </div>
+
+              <div className="mb-4 border-b border-gray-300 pt-4">
+                <h3 className="text-lg font-semibold mb-2">Product Details</h3>
+                <p className="text-sm text-gray-700">
+                  <strong>Name:</strong> {selectedProduct.product_name}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Price:</strong> ₱{selectedProduct.product_price}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Branch:</strong> {selectedProduct.branch_name}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Category:</strong> {selectedProduct.category_name}
                 </p>
               </div>
 
@@ -363,7 +400,7 @@ const Product = () => {
               </div>
 
               <p className="text-lg font-semibold mb-4">
-                Total: ${selectedProduct.product_price * quantity}
+                Total: ₱{selectedProduct.product_price * quantity}
               </p>
 
               {/* Place Order Button */}

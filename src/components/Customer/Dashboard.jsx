@@ -26,15 +26,15 @@ const Dashboard = () => {
       <Header />
       {/* Hero Section */}
       <section className="bg-white text-gray-800">
-        <div className="container mx-auto px-4 lg:px-8 flex flex-col-reverse lg:flex-row items-center gap-8 lg:gap-12">
-          <div className="lg:max-w-lg flex flex-col justify-center text-center lg:text-left px-5">
-            <h1 className="text-4xl font-extrabold leading-snug sm:text-5xl lg:text-6xl">
+        <div className="px-4 lg:px-8 flex justify-between items-center gap-8 lg:gap-12">
+          <div className="lg:max-w-xl flex flex-col justify-center text-center lg:text-left px-10">
+            <h1 className="text-4xl font-extrabold leading-snug sm:text-5xl lg:text-7xl">
               Welcome to <span className="text-teal-600">Swift Mart</span>
             </h1>
             <p className="mt-6 text-lg text-gray-600">
-              Discover a world of amazing products at unbeatable prices. From
-              everyday essentials to unique finds, Swift Mart has it all. Shop
-              with ease and convenience, anytime, anywhere.
+              Explore a world of incredible products at unmatched prices!
+              From daily necessities to one-of-a-kind treasures, Swift Mart
+              has everything you need. Shop effortlessly, anytime and anywhere.
             </p>
             <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
               <a
@@ -51,11 +51,11 @@ const Dashboard = () => {
               </a>
             </div>
           </div>
-          <div className="flex items-center justify-center w-full lg:w-1/2 p-10">
+          <div className="w-full lg:w-1/2 p-10">
             <img
               src="dash.png"
               alt="E-commerce Illustration"
-              className="object-contain w-full max-w-md lg:max-w-full"
+              className="object-contain"
             />
           </div>
         </div>
@@ -63,7 +63,7 @@ const Dashboard = () => {
 
       {/* How it works Section */}
       <section className="p-6 bg-gray-50 text-gray-800">
-        <div className="container mx-auto">
+        <div className="">
           <span className="block mb-2 text-xs font-medium tracking-widest text-center uppercase text-teal-600">
             How it works
           </span>
@@ -104,7 +104,7 @@ const Dashboard = () => {
 
       {/* Products Section */}
       <section className="py-12 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
+        <div className="px-4 lg:px-8">
           <span className="block mb-2 text-xs font-medium tracking-widest text-center uppercase text-teal-600">
             Sample Products
           </span>
@@ -125,85 +125,9 @@ const Dashboard = () => {
             <h3 className="text-lg font-semibold text-gray-800">
               {product.product_name || `Product ${index + 1}`}
             </h3>
-            <p className="mt-2 text-md text-gray-600">${product.product_price || 'N/A'}</p>
+            <p className="mt-2 text-md text-gray-600">₱{product.product_price || 'N/A'}</p>
           </div>
         ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-12 bg-gray-50">
-        <div className="container mx-auto text-center mb-8">
-          <span className="block mb-2 text-xs font-medium tracking-widest text-center uppercase text-teal-600">
-            Testimonials
-          </span>
-          <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-            What Our Customers Are Saying
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Hear directly from our satisfied customers about their experience
-            with Swift Mart. Your trust is our priority!
-          </p>
-        </div>
-        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 px-4 md:px-10">
-          <div className="flex flex-col items-center text-center bg-white shadow-lg rounded-lg p-8 hover:shadow-xl transition">
-            <div className="relative text-center mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                fill="currentColor"
-                className="absolute top-0 left-0 w-10 h-10 text-gray-300"
-              >
-                <path d="M232,246.857V16H16V416H54.4ZM48,48H200V233.143L48,377.905Z"></path>
-                <path d="M280,416h38.4L496,246.857V16H280ZM312,48H464V233.143L312,377.905Z"></path>
-              </svg>
-              <p className="px-6 py-2 text-lg italic text-gray-700">
-                "I was amazed by the quality of the products I purchased. Swift
-                Mart makes shopping easy, quick, and fun!"
-              </p>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                fill="currentColor"
-                className="absolute bottom-0 right-0 w-10 h-10 text-gray-300"
-              >
-                <path d="M280,185.143V416H496V16H457.6ZM464,384H312V198.857L464,54.1Z"></path>
-                <path d="M232,16H193.6L16,185.143V416H232ZM200,384H48V198.857L200,54.1Z"></path>
-              </svg>
-            </div>
-            <span className="w-12 h-1 my-4 rounded-lg bg-teal-600"></span>
-            <p className="text-xl font-semibold text-gray-800">Mary Jane</p>
-            <p className="text-sm text-gray-500">Verified Buyer</p>
-          </div>
-          <div className="flex flex-col items-center text-center bg-white shadow-lg rounded-lg p-8 hover:shadow-xl transition">
-            <div className="relative text-center mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                fill="currentColor"
-                className="absolute top-0 left-0 w-10 h-10 text-gray-300"
-              >
-                <path d="M232,246.857V16H16V416H54.4ZM48,48H200V233.143L48,377.905Z"></path>
-                <path d="M280,416h38.4L496,246.857V16H280ZM312,48H464V233.143L312,377.905Z"></path>
-              </svg>
-              <p className="px-6 py-2 text-lg italic text-gray-700">
-                "Swift Mart's customer service is exceptional, and their prices
-                are unbeatable. I'm a loyal customer for life!"
-              </p>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                fill="currentColor"
-                className="absolute bottom-0 right-0 w-10 h-10 text-gray-300"
-              >
-                <path d="M280,185.143V416H496V16H457.6ZM464,384H312V198.857L464,54.1Z"></path>
-                <path d="M232,16H193.6L16,185.143V416H232ZM200,384H48V198.857L200,54.1Z"></path>
-              </svg>
-            </div>
-            <span className="w-12 h-1 my-4 rounded-lg bg-teal-600"></span>
-            <p className="text-xl font-semibold text-gray-800">John Doe</p>
-            <p className="text-sm text-gray-500">Verified Buyer</p>
           </div>
         </div>
       </section>
@@ -230,7 +154,7 @@ const Dashboard = () => {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                <span>Fake address, 9999 City</span>
+                <span>Ampayon, Butuan City</span>
               </p>
               <p className="flex items-center">
                 <svg
@@ -241,7 +165,7 @@ const Dashboard = () => {
                 >
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
                 </svg>
-                <span>123456789</span>
+                <span>08-5225-5761</span>
               </p>
               <p className="flex items-center">
                 <svg
@@ -253,7 +177,7 @@ const Dashboard = () => {
                   <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                   <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
                 </svg>
-                <span>contact@business.com</span>
+                <span>swiftmart@gmail.com</span>
               </p>
             </div>
           </div>

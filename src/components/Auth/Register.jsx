@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FiEye, FiEyeOff } from "react-icons/fi"; // Importing eye icons from react-icons
+import { FiEye, FiEyeOff } from "react-icons/fi"; // Importing eye icons for toggling password visibility
 
 function Register() {
+  // State hooks for managing form data and loading state
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -12,16 +13,22 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Function to toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
+  // Handle form submission for registration
   const handleRegister = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission behavior
+
+    // Check if passwords match
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
+
+    // Prepare data for API request
     const jsonData = {
       data: {
         name: name,
@@ -33,9 +40,10 @@ function Register() {
     };
     const jsonString = JSON.stringify(jsonData);
 
-    setLoading(true); // Set loading to true before making the request
+    setLoading(true); // Indicate loading state
 
     try {
+      // Make API call to register the user
       const response = await fetch(`http://localhost:1337/api/customers`, {
         method: "POST",
         headers: {
@@ -43,32 +51,33 @@ function Register() {
         },
         body: jsonString,
       });
-      setLoading(false); // Set loading to false after receiving the response
+
+      setLoading(false); // Reset loading state after response
 
       if (response.ok) {
         const data = await response.json();
-        alert("Registration successful!");
-      window.location.reload();
+        alert("Registration successful!"); // Notify the user
+        window.location.reload(); // Reload the page
       } else {
         const errorData = await response.text();
-        alert("Registration failed!");
-        console.error(errorData);
+        alert("Registration failed!"); // Notify on failure
+        console.error(errorData); // Log error details
       }
     } catch (error) {
-      setLoading(false); // Ensure loading is stopped even if an error occurs
-      console.error("Error:", error);
-      alert("An error occurred while registering!");
+      setLoading(false); // Ensure loading is stopped even on error
+      console.error("Error:", error); // Log error
+      alert("An error occurred while registering!"); // Notify the user
     }
   };
 
   return (
     <section className="p-6 bg-gray-100 text-gray-800 min-h-screen">
-      <div className="container grid gap-6 mx-auto text-center lg:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-4 text-center lg:grid-cols-2 xl:grid-cols-5">
         {/* Left Section: Image */}
         <img
           src="img1.jpg"
           alt="Register Illustration"
-          className="object-cover w-full rounded-md xl:col-span-3 bg-gray-500 shadow-md"
+          className="object-cover w-full rounded-md xl:col-span-3 bg-gray-500 shadow-md min-h-screen"
         />
 
         {/* Right Section: Register Form */}
@@ -82,7 +91,7 @@ function Register() {
           <form noValidate className="space-y-4" onSubmit={handleRegister}>
             {/* Name Field */}
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label htmlFor="name" className="sr-only">
                 Name
               </label>
               <input
@@ -94,9 +103,10 @@ function Register() {
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-              {/* Phone Number Field */}
-              <div>
-              <label htmlFor="email" className="sr-only">
+
+            {/* Phone Number Field */}
+            <div>
+              <label htmlFor="number" className="sr-only">
                 Number
               </label>
               <input
@@ -108,9 +118,10 @@ function Register() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
             </div>
-             {/* Address Field */}
-             <div>
-              <label htmlFor="email" className="sr-only">
+
+            {/* Address Field */}
+            <div>
+              <label htmlFor="address" className="sr-only">
                 Address
               </label>
               <input
@@ -122,6 +133,7 @@ function Register() {
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
+
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="sr-only">
@@ -136,6 +148,7 @@ function Register() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
             {/* Password Field */}
             <div className="relative">
               <label htmlFor="password" className="sr-only">
@@ -162,6 +175,7 @@ function Register() {
                 )}
               </button>
             </div>
+
             {/* Confirm Password Field */}
             <div className="relative">
               <label htmlFor="confirm-password" className="sr-only">
@@ -188,6 +202,7 @@ function Register() {
                 )}
               </button>
             </div>
+
             {/* Submit Button */}
             <button
               type="submit"
@@ -220,6 +235,7 @@ function Register() {
               )}
             </button>
           </form>
+
           {/* Login Link */}
           <p className="mt-6 text-sm text-gray-600">
             Already have an account?{" "}

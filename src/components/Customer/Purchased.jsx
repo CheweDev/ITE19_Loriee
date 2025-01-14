@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header.jsx";
+import { FaSearch } from 'react-icons/fa';
 
 const Purchased = () => {
   const userDetails = JSON.parse(sessionStorage.getItem("user"));
- 
-
   const [transactionData, setTransactionData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Fetch transactions from the server
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:1337/api/transactions?filters[customer_name][$eq]=${userDetails.name}`
+          `http://localhost:1337/api/transactions?pagination[pageSize]=1000&filters[customer_name][$eq]=${userDetails.name}`
         );
+        
         const data = await response.json();
         setTransactionData(data.data);
       } catch (error) {
@@ -27,34 +26,34 @@ const Purchased = () => {
     fetchData();
   }, [userDetails.name]);
 
-  // Filter transactions by search query, date range, and sort order
-  const filteredTransactions = transactionData.filter((transaction) => {
-    const transactionDate = new Date(transaction.date);
+  // Filter transactions based on search query, date range
+  const getFilteredTransactions = () => {
+    return transactionData.filter((transaction) => {
+      const transactionDate = new Date(transaction.date);
 
-    // Check if the transaction matches the product search query
-    const matchesSearch = transaction.product_name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+      const matchesSearch = transaction.product_name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
 
-    // Check if the transaction date is within the selected range
-    const withinStartDate = startDate
-      ? transactionDate >= new Date(startDate)
-      : true;
-    const withinEndDate = endDate ? transactionDate <= new Date(endDate) : true;
+      const withinStartDate = startDate
+        ? transactionDate >= new Date(startDate)
+        : true;
+      const withinEndDate = endDate ? transactionDate <= new Date(endDate) : true;
 
-    return matchesSearch && withinStartDate && withinEndDate;
-  });
+      return matchesSearch && withinStartDate && withinEndDate;
+    });
+  };
 
   // Sort transactions by date
   const handleSort = () => {
-    const sorted = [...filteredTransactions].sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    setTransactionData(sorted);
   };
+
+  const sortedTransactions = getFilteredTransactions().sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+  });
 
   return (
     <>
@@ -63,13 +62,16 @@ const Purchased = () => {
         {/* Filters */}
         <div className="flex justify-between gap-4 mb-4 mt-5">
           <div className="flex gap-4">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by product name..."
-              className="input input-bordered w-64 border border-gray-300 rounded-lg p-2"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search the product name"
+                className="input input-bordered w-64 border border-gray-300 rounded-lg p-2 pl-10"
+              />
+              <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-600" />
+            </div>
             <div className="flex gap-2 items-center">
               <label htmlFor="startDate" className="text-sm font-medium">
                 Start Date:
@@ -106,21 +108,21 @@ const Purchased = () => {
         </div>
 
         {/* Transactions Table */}
-        {filteredTransactions.length > 0 ? (
+        {sortedTransactions.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="table-auto border-collapse border border-gray-300 w-full text-left">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border border-gray-300 px-4 py-2">Date</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Product Name
-                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Product Name</th>
                   <th className="border border-gray-300 px-4 py-2">Quantity</th>
+                  <th className="border border-gray-300 px-4 py-2">Price per Product</th>
                   <th className="border border-gray-300 px-4 py-2">Total</th>
+                  <th className="border border-gray-300 px-4 py-2">Branch</th> 
                 </tr>
               </thead>
               <tbody>
-                {filteredTransactions.map((transaction) => (
+                {sortedTransactions.map((transaction) => (
                   <tr key={transaction.id} className="hover:bg-gray-50">
                     <td className="border border-gray-300 px-4 py-2">
                       {new Date(transaction.date).toLocaleDateString()}
@@ -132,7 +134,13 @@ const Purchased = () => {
                       {transaction.quantity}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
+                      ₱{(transaction.total / transaction.quantity).toFixed(2)}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
                       ₱{transaction.total}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {transaction.branch_name}
                     </td>
                   </tr>
                 ))}

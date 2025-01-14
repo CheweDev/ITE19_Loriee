@@ -8,7 +8,7 @@ const Header = () => {
   return (
     <>
       <header className="bg-teal-600 text-white font-bold px-2">
-        <div className="container flex justify-between h-16 mx-auto">
+        <div className="flex justify-between h-16">
           <a
             rel="noopener noreferrer"
             href="#"

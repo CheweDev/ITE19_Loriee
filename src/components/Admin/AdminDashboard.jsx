@@ -30,9 +30,10 @@ const AdminDashboard = () => {
     fetchHistory();
   }, []);
 
+  // Calculate top sales and top 3 products per branch
   const calculateTopSales = (transactions) => {
     const branchSalesMap = {};
-  
+
     transactions.forEach(({ branch, product, quantity, total }) => {
       if (!branchSalesMap[branch]) {
         branchSalesMap[branch] = {
@@ -41,23 +42,24 @@ const AdminDashboard = () => {
           productQuantities: {}, // Track quantities for all products.
         };
       }
-  
+
       branchSalesMap[branch].totalSales += total;
-  
+
       if (!branchSalesMap[branch].productQuantities[product]) {
         branchSalesMap[branch].productQuantities[product] = 0;
       }
-  
+
       branchSalesMap[branch].productQuantities[product] += quantity;
     });
-  
+
     return Object.values(branchSalesMap).map(({ branch, totalSales, productQuantities }) => {
-      const topProduct = Object.entries(productQuantities).reduce(
-        (top, [product, quantity]) => (quantity > top.quantity ? { name: product, quantity } : top),
-        { name: null, quantity: 0 }
-      );
-  
-      return { branch, totalSales, topProduct };
+      const sortedProducts = Object.entries(productQuantities)
+        .map(([name, quantity]) => ({ name, quantity }))
+        .sort((a, b) => b.quantity - a.quantity);
+
+      const topProducts = sortedProducts.slice(0, 3); // Get top 3 products
+
+      return { branch, totalSales, topProducts };
     });
   };
 
@@ -123,10 +125,16 @@ const AdminDashboard = () => {
                   <strong>Total Sales:</strong> ₱
                   {branch.totalSales.toLocaleString()}
                 </p>
-                <p className="text-gray-600">
-                  <strong>Top Product:</strong> {branch.topProduct.name} (
-                  {branch.topProduct.quantity} sold)
-                </p>
+                <div className="text-gray-600 mt-2">
+                  <strong>Top Products:</strong>
+                  <ul className="mt-2">
+                    {branch.topProducts.map((product, idx) => (
+                      <li key={idx}>
+                        {product.name} ({product.quantity} sold)
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
