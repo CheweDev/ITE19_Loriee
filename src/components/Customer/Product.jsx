@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
-import Swal from 'sweetalert2';
-import { FaSearch, FaTimes,FaCheckCircle, FaRegCheckCircle  } from "react-icons/fa"; // Import icon for search and close button
+import Swal from "sweetalert2";
+import PayPalButton from "./PayPalButton";
+import {
+  FaSearch,
+  FaTimes,
+  FaCheckCircle,
+  FaRegCheckCircle,
+} from "react-icons/fa"; // Import icon for search and close button
 
 const Product = () => {
   // Example data
@@ -10,33 +16,33 @@ const Product = () => {
   const [products, setProducts] = useState([]);
   const [notification, setNotification] = useState("");
   const userDetails = JSON.parse(sessionStorage.getItem("user"));
-  
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(`http://localhost:1337/api/products`);
-        const data = await response.json();  
-        setProducts(data.data || []); 
+        const data = await response.json();
+        setProducts(data.data || []);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-  
+
     fetchProducts();
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(`http://localhost:1337/api/categories`);
-        const data = await response.json();  
-        const categoriesNames = data.data.map(item => item.category_name);
-        setCategories(categoriesNames); 
+        const data = await response.json();
+        const categoriesNames = data.data.map((item) => item.category_name);
+        setCategories(categoriesNames);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-  
+
     fetchCategories();
   }, []);
 
@@ -44,54 +50,52 @@ const Product = () => {
     const fetchBranches = async () => {
       try {
         const response = await fetch(`http://localhost:1337/api/branches`);
-        const data = await response.json();  
-        const branchNames = data.data.map(item => item.branch_name);
+        const data = await response.json();
+        const branchNames = data.data.map((item) => item.branch_name);
         setBranches(branchNames);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-  
+
     fetchBranches();
   }, []);
-
-
 
   const handlePlaceOrder = async () => {
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0];
-      const cartData = {
-        data: {
-          product_name: selectedProduct.product_name,
-          quantity: quantity,
-          total: selectedProduct.product_price * quantity,
-          customer_name: userDetails.name,
-          date: formattedDate,
-          branch_name: selectedProduct.branch_name,
+    const cartData = {
+      data: {
+        product_name: selectedProduct.product_name,
+        quantity: quantity,
+        total: selectedProduct.product_price * quantity,
+        customer_name: userDetails.name,
+        date: formattedDate,
+        branch_name: selectedProduct.branch_name,
+      },
+    };
+
+    const jsonString = JSON.stringify(cartData);
+
+    try {
+      const response = await fetch("http://localhost:1337/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      };
-  
-      const jsonString = JSON.stringify(cartData);
-  
-      try {
-        const response = await fetch("http://localhost:1337/api/transactions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: jsonString,
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Item processed:", data);
-        } else {
-          const errorData = await response.text();
-          console.error("Failed to add item:", errorData);
-        }
-      } catch (error) {
-        console.error("Error:", error);
+        body: jsonString,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Item processed:", data);
+      } else {
+        const errorData = await response.text();
+        console.error("Failed to add item:", errorData);
       }
+    } catch (error) {
+      console.error("Error:", error);
+    }
     alert("Item Buy Successful!");
     window.location.reload();
   };
@@ -157,17 +161,17 @@ const Product = () => {
         product_name: product.product_name,
         quantity: 1,
         price: product.product_price,
-        user_name: userDetails.name, 
-        branch_name : product.branch_name,
-        image:  product.image,
-      }
+        user_name: userDetails.name,
+        branch_name: product.branch_name,
+        image: product.image,
+      },
     };
     const jsonString = JSON.stringify(cartData);
     try {
       const response = await fetch("http://localhost:1337/api/carts", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
         },
         body: jsonString,
       });
@@ -180,7 +184,7 @@ const Product = () => {
         Swal.fire({
           title: "Success!",
           text: "Product added to cart.",
-          icon: "success"
+          icon: "success",
         });
       } else {
         const errorData = await response.text();
@@ -190,7 +194,7 @@ const Product = () => {
         Swal.fire({
           title: "Error",
           text: "Failed to add the product to the cart.",
-          icon: "error"
+          icon: "error",
         });
       }
     } catch (error) {
@@ -200,7 +204,7 @@ const Product = () => {
       Swal.fire({
         title: "Error",
         text: "An error occurred while adding the product to the cart.",
-        icon: "error"
+        icon: "error",
       });
     }
   };
@@ -300,19 +304,22 @@ const Product = () => {
 
                 {/* Product Details */}
                 <div className="p-4">
-                  <h5 className="text-lg font-medium mb-1">{product.product_name}</h5>
+                  <h5 className="text-lg font-medium mb-1">
+                    {product.product_name}
+                  </h5>
                   <p className="text-sm text-gray-600 mb-2">
                     {product.category_name}
                   </p>
                   <p className="text-lg font-semibold text-gray-800 mb-4">
-                  ₱{product.product_price}
+                    ₱{product.product_price}
                   </p>
 
                   <div className="flex gap-2">
                     {/* Add to Cart Button */}
-                    <button 
-                     onClick={() => handleAddToCart(product)}
-                    className="block w-2/3 px-4 text-center text-teal-600 border border-teal-600 rounded-lg hover:bg-gray-100">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="block w-2/3 px-4 text-center text-teal-600 border border-teal-600 rounded-lg hover:bg-gray-100"
+                    >
                       + Cart
                     </button>
                     <button
@@ -336,7 +343,28 @@ const Product = () => {
       {/* Modal for Product Checkout */}
       {showModal && selectedProduct && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-2/3 flex">
+          <div className="bg-white p-6 rounded-lg w-2/3 flex relative">
+            {/* Close Icon */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
             {/* Image Section */}
             <div className="flex-shrink-0 w-2/3 pr-6">
               <img
@@ -347,7 +375,7 @@ const Product = () => {
             </div>
 
             <div className="w-2/3">
-              <div className="mb-4 border-b border-gray-300 pt-4">
+              <div className="mb-4 border-b border-gray-300">
                 <h3 className="text-lg font-semibold mb-2">Shipping Details</h3>
                 <p className="text-sm text-gray-700">
                   <strong>Name:</strong> {userDetails.name}
@@ -360,7 +388,7 @@ const Product = () => {
                 </p>
               </div>
 
-              <div className="mb-4 border-b border-gray-300 pt-4">
+              <div className="mb-4 border-b border-gray-300">
                 <h3 className="text-lg font-semibold mb-2">Product Details</h3>
                 <p className="text-sm text-gray-700">
                   <strong>Name:</strong> {selectedProduct.product_name}
@@ -371,7 +399,7 @@ const Product = () => {
                 <p className="text-sm text-gray-700">
                   <strong>Branch:</strong> {selectedProduct.branch_name}
                 </p>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-700 mb-4">
                   <strong>Category:</strong> {selectedProduct.category_name}
                 </p>
               </div>
@@ -404,20 +432,28 @@ const Product = () => {
               </p>
 
               {/* Place Order Button */}
-              <button
-                onClick={handlePlaceOrder}
-                className="w-full px-4 py-2 text-white bg-teal-600 rounded-lg hover:bg-teal-700"
-              >
-                Place Order
-              </button>
+              {/* <button
+          onClick={handlePlaceOrder}
+          className="w-full px-4 py-2 text-white bg-teal-600 rounded-lg hover:bg-teal-700"
+        >
+          Place Order
+        </button> */}
 
-              {/* Close Button */}
-              <button
-                onClick={() => setShowModal(false)}
-                className="mt-2 w-full px-4 py-2 text-teal-600 border border-teal-600 rounded-lg hover:bg-gray-100"
-              >
-                Close
-              </button>
+              <PayPalButton
+                amount={(
+                  parseFloat(
+                    selectedProduct.product_price.replace("₱", "").trim()
+                  ) * quantity
+                ).toFixed(2)}
+                onSuccess={(details, data) => {
+                  alert("Payment Successful!");
+                  // Handle your order confirmation logic here
+                }}
+                onError={(err) => {
+                  console.error("Error during payment:", err);
+                  alert("Payment failed!");
+                }}
+              />
             </div>
           </div>
         </div>

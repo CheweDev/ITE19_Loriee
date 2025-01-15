@@ -8,17 +8,19 @@ const Dashboard = () => {
       try {
         const response = await fetch(`http://localhost:1337/api/products`);
         const data = await response.json();
-  
+
         // Shuffle the data and pick 8 random rows
-        const shuffledProducts = (data.data || []).sort(() => 0.5 - Math.random());
+        const shuffledProducts = (data.data || []).sort(
+          () => 0.5 - Math.random()
+        );
         const randomProducts = shuffledProducts.slice(0, 8);
-  
-        setProducts(randomProducts); 
+
+        setProducts(randomProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-  
+
     fetchProducts();
   }, []);
   return (
@@ -32,9 +34,9 @@ const Dashboard = () => {
               Welcome to <span className="text-teal-600">Swift Mart</span>
             </h1>
             <p className="mt-6 text-lg text-gray-600">
-              Explore a world of incredible products at unmatched prices!
-              From daily necessities to one-of-a-kind treasures, Swift Mart
-              has everything you need. Shop effortlessly, anytime and anywhere.
+              Explore a world of incredible products at unmatched prices! From
+              daily necessities to one-of-a-kind treasures, Swift Mart has
+              everything you need. Shop effortlessly, anytime and anywhere.
             </p>
             <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
               <a
@@ -112,28 +114,30 @@ const Dashboard = () => {
             Explore Our Top Picks
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-          <div
-            key={index}
-            className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-lg transition"
-          >
-            <img
-              src={product.image || 'placeholder.jpg'}
-              alt={product.name || `Product ${index + 1}`}
-              className="object-cover w-full h-40 mb-4 rounded-lg"
-            />
-            <h3 className="text-lg font-semibold text-gray-800">
-              {product.product_name || `Product ${index + 1}`}
-            </h3>
-            <p className="mt-2 text-md text-gray-600">₱{product.product_price || 'N/A'}</p>
-          </div>
-        ))}
+            {products.map((product, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-lg transition"
+              >
+                <img
+                  src={product.image || "placeholder.jpg"}
+                  alt={product.name || `Product ${index + 1}`}
+                  className="object-cover w-full h-40 mb-4 rounded-lg"
+                />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {product.product_name || `Product ${index + 1}`}
+                </h3>
+                <p className="mt-2 text-md text-gray-600">
+                  ₱{product.product_price || "N/A"}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-6 bg-white text-gray-900">
+      <section className="py-6 bg-white text-gray-900 border-t">
         <div className="grid max-w-6xl grid-cols-1 px-6 mx-auto lg:px-8 md:grid-cols-2 md:divide-x">
           <div className="py-6 md:py-0 md:px-6">
             <h1 className="text-4xl font-bold">Get in touch</h1>
