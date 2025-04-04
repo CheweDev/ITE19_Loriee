@@ -5,7 +5,6 @@ const AdminDashboard = () => {
   const [searchBranch, setSearchBranch] = useState("");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
 
-  // Fetch transaction history
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -21,7 +20,7 @@ const AdminDashboard = () => {
           total: parseFloat(item.total),
         }));
         setTransactionData(formattedData);
-        setFilteredTransactions(formattedData); // Initialize filtered transactions
+        setFilteredTransactions(formattedData);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
@@ -30,42 +29,36 @@ const AdminDashboard = () => {
     fetchHistory();
   }, []);
 
-  // Calculate top sales and top 3 products per branch
   const calculateTopSales = (transactions) => {
     const branchSalesMap = {};
-
     transactions.forEach(({ branch, product, quantity, total }) => {
       if (!branchSalesMap[branch]) {
         branchSalesMap[branch] = {
           branch,
           totalSales: 0,
-          productQuantities: {}, // Track quantities for all products.
+          productQuantities: {},
         };
       }
-
       branchSalesMap[branch].totalSales += total;
-
       if (!branchSalesMap[branch].productQuantities[product]) {
         branchSalesMap[branch].productQuantities[product] = 0;
       }
-
       branchSalesMap[branch].productQuantities[product] += quantity;
     });
 
-    return Object.values(branchSalesMap).map(({ branch, totalSales, productQuantities }) => {
-      const sortedProducts = Object.entries(productQuantities)
-        .map(([name, quantity]) => ({ name, quantity }))
-        .sort((a, b) => b.quantity - a.quantity);
-
-      const topProducts = sortedProducts.slice(0, 3); // Get top 3 products
-
-      return { branch, totalSales, topProducts };
-    });
+    return Object.values(branchSalesMap).map(
+      ({ branch, totalSales, productQuantities }) => {
+        const sortedProducts = Object.entries(productQuantities)
+          .map(([name, quantity]) => ({ name, quantity }))
+          .sort((a, b) => b.quantity - a.quantity);
+        const topProducts = sortedProducts.slice(0, 3); // Get top 3 products
+        return { branch, totalSales, topProducts };
+      }
+    );
   };
 
   const branchSales = calculateTopSales(transactionData);
 
-  // Filter transactions by branch name
   const handleBranchFilter = (branchName) => {
     if (branchName === "") {
       setFilteredTransactions(transactionData);
@@ -79,7 +72,6 @@ const AdminDashboard = () => {
     setSearchBranch(branchName);
   };
 
-  // Logout functionality
   const handleLogout = () => {
     console.log("User logged out");
     window.location.href = "/";
@@ -87,8 +79,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-teal-700 text-white py-5 shadow-md">
+      <header className="bg-[#205781] text-white py-5 shadow-md">
         <div className="container mx-auto px-5 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -96,7 +87,6 @@ const AdminDashboard = () => {
               Monitor branch performance and transactions
             </p>
           </div>
-          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="bg-white text-teal-700 hover:bg-teal-100 px-4 py-2 rounded-lg font-medium shadow"
@@ -105,9 +95,7 @@ const AdminDashboard = () => {
           </button>
         </div>
       </header>
-
       <main className="container mx-auto px-5 py-10">
-        {/* Top Sales Section */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             Top Sales Per Branch
@@ -139,14 +127,10 @@ const AdminDashboard = () => {
             ))}
           </div>
         </section>
-
-        {/* Transaction History Section */}
         <section>
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             Transaction History
           </h2>
-
-          {/* Filter Input */}
           <div className="mb-6">
             <label htmlFor="branch" className="block text-gray-600 font-medium">
               Filter by Branch:
@@ -160,8 +144,6 @@ const AdminDashboard = () => {
               className="input input-bordered border border-gray-300 rounded-lg p-2 w-full md:w-64 mt-2"
             />
           </div>
-
-          {/* Transaction Table */}
           <div className="overflow-x-auto bg-white rounded-lg shadow-md">
             <table className="table-auto border-collapse border border-gray-300 w-full text-left">
               <thead className="bg-teal-700 text-white">

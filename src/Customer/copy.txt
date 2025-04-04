@@ -1,0 +1,118 @@
+ const handlePlaceOrder = async () => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0];
+    const cartData = {
+      data: {
+        product_name: selectedProduct.product_name,
+        quantity: quantity,
+        total: selectedProduct.product_price * quantity,
+        customer_name: userDetails.name,
+        date: formattedDate,
+        branch_name: selectedProduct.branch_name,
+      },
+    };
+    const jsonString = JSON.stringify(cartData);
+    try {
+      const response = await fetch("http://localhost:1337/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonString,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Item processed:", data);
+      } else {
+        const errorData = await response.text();
+        console.error("Failed to add item:", errorData);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    alert("Item Buy Successful!");
+    window.location.reload();
+  };
+
+                <button
+                onClick={handlePlaceOrder}
+                className="w-full px-4 py-2 text-white bg-teal-600 rounded-lg hover:bg-teal-700"
+              >
+                Place Order
+              </button>
+
+
+               {showModal && selectedProduct && (
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-lg relative flex">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+            >
+              ✖
+            </button>
+
+            {/* Left: Product Image */}
+            <div className="w-1/2 pr-6">
+              <img
+                src={selectedProduct.image}
+                alt={selectedProduct.product_name}
+                className="w-full h-64 object-cover rounded-lg shadow-md"
+              />
+            </div>
+
+            {/* Right: Checkout Details */}
+            <div className="w-1/2 flex flex-col">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {selectedProduct.product_name}
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                <strong>Category:</strong> {selectedProduct.category_name}
+              </p>
+
+              {/* Shipping Details */}
+              <div className="border-t border-gray-300 pt-4 mb-4">
+                <h4 className="text-lg font-semibold">Shipping Details</h4>
+                <p className="text-sm text-gray-700">
+                  <strong>Name:</strong> {userDetails.name}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Address:</strong> {userDetails.address}
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Phone:</strong> {userDetails.phoneNumber}
+                </p>
+              </div>
+
+              {/* Quantity Input */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Quantity</label>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  className="w-full border border-gray-300 rounded-md p-2 mt-1"
+                  min="1"
+                />
+              </div>
+
+              {/* Price & Checkout Button */}
+              <div className="mt-auto">
+                <p className="text-lg font-bold text-gray-900 mb-4">
+                  Total:{" "}
+                  <span className="text-[#205781]">
+                    ₱{selectedProduct.product_price * quantity}
+                  </span>
+                </p>
+                <button
+                  onClick={handlePlaceOrder}
+                  className="w-full bg-[#205781] text-white py-2 rounded-lg hover:bg-[#18496d] transition"
+                >
+                  Confirm Checkout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}

@@ -7,12 +7,21 @@ const Cart = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [checkedOutItems, setCheckedOutItems] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [bankProvider, setBankProvider] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [gcashNumber, setGcashNumber] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [bankProvider, setBankProvider] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [gcashNumber, setGcashNumber] = useState("");
 
-  const banks = ['Unionbank', 'Security Bank', 'Landbank', 'BPI', 'China Bank', 'EastWest', 'BDO', 'Metrobank'];
+  const banks = [
+    "Unionbank",
+    "Security Bank",
+    "Landbank",
+    "BPI",
+    "China Bank",
+    "EastWest",
+    "BDO",
+    "Metrobank",
+  ];
 
   useEffect(() => {
     fetchCartItems();
@@ -25,7 +34,7 @@ const Cart = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setCartItems(data.data.map(item => ({ ...item, selected: false }))); // Initialize selected as false
+        setCartItems(data.data.map((item) => ({ ...item, selected: false }))); // Initialize selected as false
       } else {
         console.error("Failed to fetch cart items");
       }
@@ -74,7 +83,7 @@ const Cart = () => {
   };
 
   const handleCheckoutClick = () => {
-    const hasSelectedItems = cartItems.some(item => item.selected);
+    const hasSelectedItems = cartItems.some((item) => item.selected);
     if (!hasSelectedItems) {
       alert("Please select at least one item to checkout");
       return;
@@ -102,8 +111,8 @@ const Cart = () => {
           customer_name: item?.user_name || "Guest",
           date: formattedDate,
           branch_name: item.branch_name,
-          bank_provider: paymentMethod === 'card' ? bankProvider : 'GCash',
-          card_number: paymentMethod === 'card' ? cardNumber : gcashNumber,
+          bank_provider: paymentMethod === "card" ? bankProvider : "GCash",
+          card_number: paymentMethod === "card" ? cardNumber : gcashNumber,
         },
       };
 
@@ -168,8 +177,8 @@ const Cart = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col mx-auto max-w-4xl p-3 space-y-2 sm:p-10 bg-gray-50 text-gray-800 mt-3">
-        <div className="flex justify-between">
+      <div className="flex flex-col mx-auto max-w-5xl p-3 space-y-2 sm:p-10 bg-gray-50 text-gray-800 mt-3">
+        <div className="flex justify-between border-b p-2">
           <h2 className="text-2xl font-bold">Cart</h2>
         </div>
         {cartItems.length > 0 ? (
@@ -239,9 +248,24 @@ const Cart = () => {
                             className="w-4 h-4 fill-current"
                           >
                             <path d="M96,472a23.82,23.82,0,0,0,23.579,24H392.421A23.82,23.82,0,0,0,416,472V152H96Zm32-288H384V464H128Z"></path>
-                            <rect width="32" height="200" x="168" y="216"></rect>
-                            <rect width="32" height="200" x="240" y="216"></rect>
-                            <rect width="32" height="200" x="312" y="216"></rect>
+                            <rect
+                              width="32"
+                              height="200"
+                              x="168"
+                              y="216"
+                            ></rect>
+                            <rect
+                              width="32"
+                              height="200"
+                              x="240"
+                              y="216"
+                            ></rect>
+                            <rect
+                              width="32"
+                              height="200"
+                              x="312"
+                              y="216"
+                            ></rect>
                             <path d="M328,88V40c0-13.458-9.488-24-21.6-24H205.6C193.488,16,184,26.542,184,40V88H64v32H448V88ZM216,48h80V88H216Z"></path>
                           </svg>
                           <span>Remove</span>
@@ -253,8 +277,8 @@ const Cart = () => {
               ))}
             </ul>
 
-            <div className="space-y-1 text-right">
-              <p>
+            <div className="space-y-1 text-right border-t">
+              <p className="mt-5">
                 Total amount for selected items:
                 <span className="font-semibold">
                   {" "}
@@ -274,7 +298,7 @@ const Cart = () => {
               <button
                 type="button"
                 onClick={handleCheckoutClick}
-                className="px-6 py-3 text-sm font-semibold text-white bg-green-800 rounded-md hover:bg-gray-900"
+                className="px-6 py-3 text-sm font-semibold text-white bg-[#205781] rounded-md"
               >
                 Continue to Checkout (Selected)
               </button>
@@ -285,7 +309,7 @@ const Cart = () => {
             <p className="text-lg text-gray-500 mb-4">
               Your cart is empty. Start adding now!
             </p>
-            <button className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-gray-900">
+            <button className="px-6 py-3 bg-[#205781] text-white rounded-lg">
               Continue Shopping
             </button>
           </div>
@@ -304,7 +328,7 @@ const Cart = () => {
                     <input
                       type="radio"
                       value="card"
-                      checked={paymentMethod === 'card'}
+                      checked={paymentMethod === "card"}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mr-2"
                     />
@@ -314,7 +338,7 @@ const Cart = () => {
                     <input
                       type="radio"
                       value="gcash"
-                      checked={paymentMethod === 'gcash'}
+                      checked={paymentMethod === "gcash"}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="mr-2"
                     />
@@ -323,7 +347,7 @@ const Cart = () => {
                 </div>
               </div>
 
-              {paymentMethod === 'card' ? (
+              {paymentMethod === "card" ? (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header.jsx";
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch } from "react-icons/fa";
 
 const Purchased = () => {
   const userDetails = JSON.parse(sessionStorage.getItem("user"));
@@ -16,7 +16,7 @@ const Purchased = () => {
         const response = await fetch(
           `http://localhost:1337/api/transactions?pagination[pageSize]=1000&filters[customer_name][$eq]=${userDetails.name}`
         );
-        
+
         const data = await response.json();
         setTransactionData(data.data);
       } catch (error) {
@@ -38,7 +38,9 @@ const Purchased = () => {
       const withinStartDate = startDate
         ? transactionDate >= new Date(startDate)
         : true;
-      const withinEndDate = endDate ? transactionDate <= new Date(endDate) : true;
+      const withinEndDate = endDate
+        ? transactionDate <= new Date(endDate)
+        : true;
 
       return matchesSearch && withinStartDate && withinEndDate;
     });
@@ -58,9 +60,9 @@ const Purchased = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto p-5">
+      <div className="p-5">
         {/* Filters */}
-        <div className="flex justify-between gap-4 mb-4 mt-5">
+        <div className="flex justify-between gap-4 mb-4">
           <div className="flex gap-4">
             <div className="relative">
               <input
@@ -114,11 +116,15 @@ const Purchased = () => {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border border-gray-300 px-4 py-2">Date</th>
-                  <th className="border border-gray-300 px-4 py-2">Product Name</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Product Name
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Quantity</th>
-                  <th className="border border-gray-300 px-4 py-2">Price per Product</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Price per Product
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Total</th>
-                  <th className="border border-gray-300 px-4 py-2">Branch</th> 
+                  <th className="border border-gray-300 px-4 py-2">Branch</th>
                 </tr>
               </thead>
               <tbody>

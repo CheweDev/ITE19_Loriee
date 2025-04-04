@@ -8,98 +8,97 @@ const Dashboard = () => {
       try {
         const response = await fetch(`http://localhost:1337/api/products`);
         const data = await response.json();
-
-        // Shuffle the data and pick 8 random rows
         const shuffledProducts = (data.data || []).sort(
           () => 0.5 - Math.random()
         );
         const randomProducts = shuffledProducts.slice(0, 8);
-
         setProducts(randomProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-
     fetchProducts();
   }, []);
+
   return (
     <>
       <Header />
-      {/* Hero Section */}
-      <section className="bg-white text-gray-800">
-        <div className="px-4 lg:px-8 flex justify-between items-center gap-8 lg:gap-12">
-          <div className="lg:max-w-xl flex flex-col justify-center text-center lg:text-left px-10">
-            <h1 className="text-4xl font-extrabold leading-snug sm:text-5xl lg:text-7xl">
-              Welcome to <span className="text-teal-600">Swift Mart</span>
-            </h1>
-            <p className="mt-6 text-lg text-gray-600">
-              Explore a world of incredible products at unmatched prices! From
-              daily necessities to one-of-a-kind treasures, Swift Mart has
-              everything you need. Shop effortlessly, anytime and anywhere.
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-              <a
-                href="/product"
-                className="px-6 py-3 text-lg font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700"
-              >
-                Start Shopping
-              </a>
-              <a
-                href="#testimonials"
-                className="px-6 py-3 text-lg font-medium text-teal-600 border border-teal-600 rounded-lg hover:bg-gray-100"
-              >
-                Learn More
-              </a>
-            </div>
+      {/* Hero  */}
+      <section>
+        <div className="relative">
+          <div
+            className="absolute inset-0 -z-10"
+            style={{
+              backgroundImage: `url('/img6.jpg')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div className="absolute inset-0 bg-black opacity-50"></div>
           </div>
-          <div className="w-full lg:w-1/2 p-10">
-            <img
-              src="dash.png"
-              alt="E-commerce Illustration"
-              className="object-contain"
-            />
+          {/* Content */}
+          <div className="relative container flex flex-col items-center px-4 py-16 pb-24 mx-auto text-center lg:pb-56 md:py-32 md:px-10 lg:px-32">
+            <h1 className="text-5xl font-bold leading-none sm:text-6xl xl:max-w-3xl text-gray-50">
+              Provident blanditiis cum exercitationem
+            </h1>
+            <p className="mt-6 mb-8 text-lg sm:mb-12 xl:max-w-3xl text-gray-50">
+              Cupiditate minima voluptate temporibus quia? Architecto beatae
+              esse ab amet vero eaque explicabo!
+            </p>
+            <div className="flex flex-wrap justify-center">
+              <button
+                type="button"
+                className="px-8 py-3 m-2 text-lg font-semibold rounded bg-gray-100 text-gray-900"
+              >
+                Get started
+              </button>
+              <button
+                type="button"
+                className="px-8 py-3 m-2 text-lg border rounded border-gray-300 text-gray-50"
+              >
+                Learn more
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* How it works Section */}
-      <section className="p-6 bg-gray-50 text-gray-800">
-        <div className="">
-          <span className="block mb-2 text-xs font-medium tracking-widest text-center uppercase text-teal-600">
-            How it works
-          </span>
-          <h2 className="text-5xl font-bold text-center text-gray-900">
-            Shopping with Swift Mart is Easy!
-          </h2>
-          <div className="grid gap-6 my-16 lg:grid-cols-3">
-            <div className="flex flex-col p-8 space-y-4 rounded-md bg-gray-50">
-              <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-xl font-bold rounded-full bg-teal-600 text-gray-50">
-                1
-              </div>
-              <p className="text-2xl font-semibold">
-                <b>Browse Products</b> Explore a variety of products from
-                categories that interest you.
-              </p>
+      <section className="p-6 bg-gray-100 text-gray-800 border-t">
+        <span className="block mb-2 text-xs font-medium tracking-widest text-center uppercase text-teal-600">
+          How it works
+        </span>
+        <h2 className="text-4xl font-bold text-center text-gray-900">
+          Shopping with Our Shop is Easy!
+        </h2>
+        <div className="grid gap-6 my-16 lg:grid-cols-3">
+          <div className="flex flex-col p-8 space-y-4 rounded-md bg-gray-50">
+            <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-xl font-bold rounded-full bg-[#5F99AE] text-gray-50">
+              1
             </div>
-            <div className="flex flex-col p-8 space-y-4 rounded-md bg-gray-50">
-              <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-xl font-bold rounded-full bg-teal-600 text-gray-50">
-                2
-              </div>
-              <p className="text-2xl font-semibold">
-                <b>Add to Cart</b> Choose your favorites and add them to your
-                shopping cart.
-              </p>
+            <p className="text-2xl font-semibold">
+              <b>Browse Products</b> Explore a variety of products from
+              categories that interest you.
+            </p>
+          </div>
+          <div className="flex flex-col p-8 space-y-4 rounded-md bg-gray-50">
+            <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-xl font-bold rounded-full bg-[#5F99AE] text-gray-50">
+              2
             </div>
-            <div className="flex flex-col p-8 space-y-4 rounded-md bg-gray-50">
-              <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-xl font-bold rounded-full bg-teal-600 text-gray-50">
-                3
-              </div>
-              <p className="text-2xl font-semibold">
-                <b>Checkout</b> Proceed to checkout, select your payment method,
-                and confirm your order!
-              </p>
+            <p className="text-2xl font-semibold">
+              <b>Add to Cart</b> Choose your favorites and add them to your
+              shopping cart.
+            </p>
+          </div>
+          <div className="flex flex-col p-8 space-y-4 rounded-md bg-gray-50">
+            <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-xl font-bold rounded-full bg-[#5F99AE] text-gray-50">
+              3
             </div>
+            <p className="text-2xl font-semibold">
+              <b>Checkout</b> Proceed to checkout, select your payment method,
+              and confirm your order!
+            </p>
           </div>
         </div>
       </section>
@@ -181,7 +180,7 @@ const Dashboard = () => {
                   <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                   <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
                 </svg>
-                <span>swiftmart@gmail.com</span>
+                <span>richardShop@gmail.com</span>
               </p>
             </div>
           </div>
@@ -194,7 +193,7 @@ const Dashboard = () => {
               <input
                 type="text"
                 placeholder="John Doe"
-                className="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-teal-600  bg-gray-100"
+                className="block w-full p-2 rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-[#205781] bg-gray-100"
               />
             </label>
             <label className="block">
@@ -202,19 +201,19 @@ const Dashboard = () => {
               <input
                 type="email"
                 placeholder="example@gmail.com"
-                className="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-teal-600  bg-gray-100"
+                className="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 p-2 focus:ring-[#205781] bg-gray-100"
               />
             </label>
             <label className="block">
               <span className="mb-1">Message</span>
               <textarea
                 rows="3"
-                className="block w-full rounded-md focus:ring focus:ring-opacity-75 focus:ring-teal-600 bg-gray-100"
+                className="block w-full rounded-md focus:ring focus:ring-opacity-75 focus:ring-[#205781] bg-gray-100"
               ></textarea>
             </label>
             <button
               type="button"
-              className="self-center px-8 py-3 text-lg rounded focus:ring hover:ring focus:ring-opacity-75 bg-teal-600 text-gray-50 focus:ring-teal-600 hover:ring-teal-600"
+              className="self-center px-8 py-2 text-lg rounded focus:ring hover:ring focus:ring-opacity-75 bg-[#205781] text-gray-50 focus:ring-teal-600 hover:ring-teal-600"
             >
               Submit
             </button>
@@ -223,7 +222,7 @@ const Dashboard = () => {
       </section>
 
       {/* Footer */}
-      <footer className="px-4 divide-y bg-gray-100 text-gray-800">
+      <footer className="px-4 divide-y bg-[#5F99AE] text-white">
         <div className="container flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0">
           <div className="lg:w-1/3">
             <a
@@ -235,7 +234,7 @@ const Dashboard = () => {
                 <img src="logo.png" alt="logo" />
               </div>
               <span className="self-center text-2xl font-semibold">
-                Swift Mart
+                Richard's Shop
               </span>
             </a>
           </div>
@@ -348,8 +347,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="py-4 text-xs text-center text-gray-400">
-          <p>© 2025 Swift Mart. All Rights Reserved.</p>
+        <div className="py-4 text-xs text-center text-white">
+          <p>© 2025 Richard's Shop. All Rights Reserved.</p>
         </div>
       </footer>
     </>
